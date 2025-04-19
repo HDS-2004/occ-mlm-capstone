@@ -10,8 +10,8 @@ detection_threshold = 0.5
 cammyLowThresh = 30
 cammyHighThresh = 100
 
-#TODO: Clarify whether we need to read the second image to deciper a full packet
-#TODO: Clarify on a method to avoid the weird bloom effects in high light regions and the reverse effect in dark regions
+#Manchester 1 = 0->1
+#Manster 0 = 1->0
 
 def find_two_biggest_pairs(input_pairs:tuple)->list[tuple]:
     difference_array = []
@@ -23,13 +23,22 @@ def find_two_biggest_pairs(input_pairs:tuple)->list[tuple]:
     indexSecond = difference_array.index(sorted_difference_array[1])
     return [input_pairs[indexFirst],input_pairs[indexSecond]]
 
-def roughly_equal(a, b, tolerance=0):
+def roughly_equal(a, b, tolerance=0)->bool:
     if a == b:
         return True
     denominator = max(abs(a), abs(b), 1e-12)  # Prevent division by zero
     return abs(a - b) <= tolerance * denominator
 
 
+def decode_manchester(seq):
+    decoded_bits = []
+    for i in range(0, len(seq)-1, 2):
+        pair = (seq[i], seq[i+1])
+        if pair == (1, 0):
+            decoded_bits.append(0)
+        elif pair == (0, 1):
+            decoded_bits.append(1)
+    return decoded_bits
 
 
 def main():
@@ -130,34 +139,14 @@ def main():
         #Step 3 extract the binary data
         actual_data = vertical_stripe_normalize[payload_start:payload_end]
         detection_threshold = (max(vertical_stripe_normalize)+min(vertical_stripe_normalize))/2
-        actual_data = (actual_data>=detection_threshold).astype(numpy.uint8)
-        cleaned_actual_data = []
-        runner_counter = 0
-        for r in range(len(actual_data)):
-            #TODO This needs to be patched such that: 
-            #When the relative difference between a light region and dark region is lower, the signal must increase the threshold value for dark regions and decrease it for light regions. 
-            #Rn its hardcoded so it doesnt work properly
-            if(r == len(actual_data)-1):
-                continue
-            if(actual_data[r] == actual_data[r+1]):
-                runner_counter+=1
-                if(actual_data[r] == 1 and roughly_equal(runner_counter,7,0)):
-                    cleaned_actual_data.append(actual_data[r])
-                    runner_counter = 0
-                elif (actual_data[r] == 0 and roughly_equal(runner_counter,3,0)):
-                    cleaned_actual_data.append(actual_data[r])
-                    runner_counter = 0
-                # elif(actual_data[r] == 1):
-                #     print("ones "+str(runner_counter))
-                # elif(actual_data[r] == 0):
-                #     print("zeroes "+ str(runner_counter))
-            else:
-                runner_counter = 1
-        # ascii_string = actual_data.tobytes().decode('ascii')
-        # print(ascii_string)
-        cleaned_actual_data = numpy.array(cleaned_actual_data,dtype=numpy.uint8)
-        print(cleaned_actual_data.tobytes().hex(','))
-        return
+        actual_data = (actual_data>=detection_threshold).astype(numpy.uint8).flatten()
+        diff_mask = numpy.diff(actual_data) != 0
+        full_mask = numpy.insert(diff_mask, 0, True) 
+        return_data = actual_data[full_mask] #compute the difference between adjancent data points, check whether its not equal to zero (there is a difference), if there is a difference it will mark as true indicating a unique data point, afterwards we add a true to preserve first element. We now use this true/false mask on the original vector to obtain the final data points.
+        print(return_data.tobytes().hex(','))
+        
+        return_data = decode_manchester(return_data[1:])
+        print(return_data) #DOESNT WORK, if a zero (0->1) and a one (1->0) was encoded consecutively, [0,1,1,0], it would fail due to duplicate removal creating a unpaired group
         i+=1
 if(__name__ == "__main__"):
     main()
