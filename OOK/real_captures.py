@@ -56,13 +56,12 @@ def main():
         # cv2.destroyAllWindows()
         # return
         vertical_stripe = img_blur[:,math.floor(width/2)] #take all rows from the center of the image. This is the slice we use to demodulate
-        vertical_stripe_normalize = (vertical_stripe - numpy.min(vertical_stripe))/(numpy.max(vertical_stripe)-numpy.min(vertical_stripe))
 
 
 
-        actual_data = vertical_stripe_normalize
+        actual_data = vertical_stripe.astype(numpy.uint8)
         
-        _,actual_data = cv2.threshold(actual_data,numpy.median(actual_data),1,cv2.THRESH_BINARY)
+        _,actual_data = cv2.threshold(actual_data,0,1,cv2.THRESH_BINARY +cv2.THRESH_OTSU)
         result = actual_data[numpy.insert(actual_data[1:] != actual_data[:-1], 0, True)]
         result = result.astype(numpy.uint8)
         print(result.tobytes().hex(','))
