@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load image
-file_path = input("C:\School stuff\2025\Sem 1\Capstone A")
+file_path = "OOK/sample_packets/frame_663.png"
 
 image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
 
