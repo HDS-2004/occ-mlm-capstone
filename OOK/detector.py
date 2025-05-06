@@ -13,6 +13,9 @@ cammyHighThresh = 100
 #TODO: Clarify whether we need to read the second image to deciper a full packet
 #TODO: Clarify on a method to avoid the weird bloom effects in high light regions and the reverse effect in dark regions
 
+#cv2 threshold
+#OC
+
 def find_two_biggest_pairs(input_pairs:tuple)->list[tuple]:
     difference_array = []
     sorted_difference_array = []
