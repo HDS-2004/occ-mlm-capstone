@@ -49,12 +49,16 @@ def main():
         clahe = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(2,2))
         img = clahe.apply(img)
         img_blur = cv2.GaussianBlur(img,(3,21),0)
-        # _,ret = cv2.threshold(img_blur,numpy.median(img_blur),255,cv2.THRESH_BINARY)
-        # ret = cv2.Mat(ret.astype(numpy.uint8))
+        _,ret = cv2.threshold(img_blur,numpy.median(img_blur),255,cv2.THRESH_BINARY)
+        ret = cv2.Mat(ret.astype(numpy.uint8))
         # cv2.imshow("w",cv2.resize(ret,(800,600)))
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
         # return
+        os.makedirs("non_header_thresh_results",exist_ok=True)
+        output_path = os.path.join('non_header_thresh_results', os.path.basename(img_array[i]))
+        cv2.imwrite(output_path, ret)
+
         vertical_stripe = img_blur[:,math.floor(width/2)] #take all rows from the center of the image. This is the slice we use to demodulate
 
 

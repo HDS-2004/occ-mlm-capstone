@@ -81,7 +81,7 @@ def main():
         width_between_peaks = numpy.median(numpy.diff(peaks))
         #Now we know how many bits it takes for a single symbol. Next we find the header to identify the region of interest.
         #Step 2 header identification and subsequent identification of ROI
-        binary = (vertical_stripe_normalize>=0.1).astype(numpy.uint8)
+        binary = (vertical_stripe_normalize>=0.5).astype(numpy.uint8)
         j = 0
         header_start_end_pairs = []
         header_start = -1
