@@ -21,8 +21,8 @@ constexpr uint16_t bar_duration = 100;
 // Higher bar duration, higher chance the whole packets going to appear very flickery in the camera (but its fine, always prefer longer bar duration over shorter , makes the pulses have better pulse shape by giving it more time to form)
 constexpr uint16_t guard_duration = 400; // tune
 // 200 working
-constexpr float guard_multiplier = 1.4;
-
+constexpr float guard_multiplier = 1.3;
+// Do not change guard times
 static void inline pulser(uint8_t p)
 {
   uint16_t t_on = floor(t_shutter * (p / 255.0));
