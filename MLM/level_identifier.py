@@ -1,12 +1,13 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy._typing._array_like import NDArray
 from sklearn.mixture import GaussianMixture
 import scipy.stats as stats
 
 
 
-def get_the_four_levels(video_path,header_frames):
+def get_the_four_levels(video_path):
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
@@ -15,6 +16,8 @@ def get_the_four_levels(video_path,header_frames):
 
     histogram = np.zeros(256, dtype=np.int64)
     frame_id = 0
+    max_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    header_frames = list(range(0, max_frames, 5))
 
     while True:
         ret, frame = cap.read()
@@ -47,18 +50,18 @@ def get_the_four_levels(video_path,header_frames):
 
     gmm_means = sorted([int(m) for m in gmm.means_.flatten()])
     print(gmm_means)
-    #Verify the guesses
-    # x = np.linspace(0, 255, 256)
-    # plt.hist(intensity_values, bins=256, range=(0,255), density=True, alpha=0.5, color='lightblue')
+    # Verify the guesses
+    x = np.linspace(0, 255, 256)
+    plt.hist(intensity_values, bins=256, range=(0,255), density=True, alpha=0.5, color='lightblue')
 
-    # for mean, var, weight in zip(gmm.means_.flatten(), gmm.covariances_.flatten(), gmm.weights_):
-    #     gaussian = stats.norm.pdf(x, mean , np.sqrt(var)) * weight
-    #     plt.plot(x, gaussian, linewidth=2)
+    for mean, var, weight in zip(gmm.means_.flatten(), gmm.covariances_.flatten(), gmm.weights_):
+        gaussian = stats.norm.pdf(x, mean , np.sqrt(var)) * weight
+        plt.plot(x, gaussian, linewidth=2)
 
-    # plt.title("GMM Gaussians over Histogram")
-    # plt.xlabel("Intensity")
-    # plt.ylabel("Density")
-    # plt.show()
+    plt.title("GMM Gaussians over Histogram")
+    plt.xlabel("Intensity")
+    plt.ylabel("Density")
+    plt.show()
 
     # # Plot the histogram
     # plt.figure(figsize=(10, 5))
@@ -70,7 +73,7 @@ def get_the_four_levels(video_path,header_frames):
     # plt.ylabel("Frequency")
     # plt.show()
 
-    #4 levels found, now iterate from the 0th frame looking for header start.
+    # # 4 levels found, now iterate from the 0th frame looking for header start.
 
     # lowest_bic = np.inf
     # best_gmm = None

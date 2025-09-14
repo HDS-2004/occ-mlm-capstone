@@ -94,12 +94,7 @@ static void inline guarded_pulser(uint8_t p, uint8_t previousp, uint8_t nextp)
 
 static void inline header()
 {
-  PORTB &= ~(1 << PB3);
-  delayMicroseconds(1000);
-  PORTB |= (1 << PB3);
-  delayMicroseconds(5);
-  PORTB &= ~(1 << PB3);
-  delayMicroseconds(1000);
+  guarded_pulser(levels[3], levels[3], levels[3]);
   // PORTB &= ~(1 << PB3);
   // delayMicroseconds(2000);
 }
