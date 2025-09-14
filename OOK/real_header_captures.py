@@ -146,6 +146,19 @@ def main() -> None:
         print(payload_start)
         print("Payload end")
         print(payload_end)
+        img3= cv2.imread(img_array[i],flags=cv2.IMREAD_GRAYSCALE)
+        img3 = img3[payload_start:payload_end,:]
+        output_folder = "cropped_payloads"
+
+        # Check if folder exists, create if not
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+
+        # Generate filename and save
+        filename = os.path.basename(img_array[i])
+        save_path = os.path.join(output_folder, f"cropped_{filename}")
+        cv2.imwrite(save_path, img3)
+
         actual_data = binary[payload_start:payload_end]
         start = -1
 
